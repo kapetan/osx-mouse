@@ -1,0 +1,30 @@
+{
+  "name": "osx-mouse",
+  "version": "1.0.0",
+  "description": "Track mouse inputs in OS X",
+  "main": "index.js",
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kapetan/osx-mouse"
+  },
+  "keywords": [
+    "track",
+    "mouse",
+    "events",
+    "osx",
+    "native",
+    "screen",
+    "display",
+    "position"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kapetan/osx-mouse/issues"
+  },
+  "homepage": "https://github.com/kapetan/osx-mouse",
+  "dependencies": {
+    "bindings": "^1.2.1",
+    "nan": "^1.8.4"
+  }
+}
