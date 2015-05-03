@@ -1,9 +1,11 @@
 {
   "name": "osx-mouse",
   "version": "1.0.0",
-  "description": "Track mouse inputs in OS X",
+  "description": "Mouse tracking for OS X",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "node-gyp rebuild && node test/destroy && node test/unref"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/kapetan/osx-mouse"

@@ -13,22 +13,32 @@ struct MouseEvent {
 
 class Mouse : public node::ObjectWrap {
 	public:
-		static void Initialize();
+		static void Initialize(Handle<Object> exports);
 		static Persistent<Function> constructor;
 		void Run();
+		void Stop();
 		void HandleEvent(CGEventType type, CGEventRef event);
-		void ExecuteCallback();
+		void HandleClose();
+		void HandleSend();
 
 	private:
 		MouseEvent* event;
-		NanCallback* callback;
+		NanCallback* event_callback;
+		NanCallback* destroy_callback;
 		uv_async_t* async;
 		uv_mutex_t async_lock;
 		uv_thread_t thread;
+		uv_cond_t async_cond;
+		uv_mutex_t async_cond_lock;
+		CFRunLoopRef loop_ref;
+		bool stopped;
+		bool finished;
 
 		explicit Mouse(NanCallback*);
 		~Mouse();
 
 		static NAN_METHOD(New);
 		static NAN_METHOD(Destroy);
+		static NAN_METHOD(AddRef);
+		static NAN_METHOD(RemoveRef);
 };

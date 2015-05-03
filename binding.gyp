@@ -2,7 +2,7 @@
 	"targets": [
 		{
 			"target_name": "addon",
-			"sources": ["addon.cc", "mouse.cc"],
+			"sources": ["source/addon.cc", "source/mouse.cc"],
 			"link_settings": {
 				"libraries": [
 					"/System/Library/Frameworks/CoreGraphics.framework"
