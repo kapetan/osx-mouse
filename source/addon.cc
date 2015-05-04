@@ -1,4 +1,3 @@
-#include <node.h>
 #include "mouse.h"
 
 void Initialize(Handle<Object> exports) {
