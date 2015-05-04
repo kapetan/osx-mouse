@@ -2,12 +2,12 @@
 
 bool IsMouseEvent(CGEventType type) {
 	return type == kCGEventLeftMouseDown ||
-			type == kCGEventLeftMouseUp ||
-			type == kCGEventRightMouseDown ||
-			type == kCGEventRightMouseUp ||
-			type == kCGEventMouseMoved ||
-			type == kCGEventLeftMouseDragged ||
-			type == kCGEventRightMouseDragged;
+		type == kCGEventLeftMouseUp ||
+		type == kCGEventRightMouseDown ||
+		type == kCGEventRightMouseUp ||
+		type == kCGEventMouseMoved ||
+		type == kCGEventLeftMouseDragged ||
+		type == kCGEventRightMouseDragged;
 }
 
 void RunThread(void* arg) {
@@ -83,19 +83,20 @@ void Mouse::Initialize(Handle<Object> exports) {
 void Mouse::Run() {
 	CFRunLoopRef ref = CFRunLoopGetCurrent();
 	CGEventMask mask = CGEventMaskBit(kCGEventLeftMouseDown) |
-						CGEventMaskBit(kCGEventLeftMouseUp) |
-						CGEventMaskBit(kCGEventRightMouseDown) |
-						CGEventMaskBit(kCGEventRightMouseUp) |
-						CGEventMaskBit(kCGEventMouseMoved) |
-						CGEventMaskBit(kCGEventLeftMouseDragged) |
-						CGEventMaskBit(kCGEventRightMouseDragged);
+		CGEventMaskBit(kCGEventLeftMouseUp) |
+		CGEventMaskBit(kCGEventRightMouseDown) |
+		CGEventMaskBit(kCGEventRightMouseUp) |
+		CGEventMaskBit(kCGEventMouseMoved) |
+		CGEventMaskBit(kCGEventLeftMouseDragged) |
+		CGEventMaskBit(kCGEventRightMouseDragged);
 
-	CFMachPortRef tap = CGEventTapCreate(kCGHIDEventTap,
-										 kCGHeadInsertEventTap,
-										 kCGEventTapOptionListenOnly,
-										 mask,
-										 OnMouseEvent,
-										 this);
+	CFMachPortRef tap = CGEventTapCreate(
+		kCGHIDEventTap,
+		kCGHeadInsertEventTap,
+		kCGEventTapOptionListenOnly,
+		mask,
+		OnMouseEvent,
+		this);
 
 	CFRunLoopSourceRef source = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, tap, 0);
 	CFRunLoopAddSource(ref, source, kCFRunLoopCommonModes);
