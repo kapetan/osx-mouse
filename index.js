@@ -22,6 +22,7 @@ module.exports = function() {
 
 	that.destroy = function(callback) {
 		if(mouse) mouse.destroy(callback);
+		else if(callback) callback();
 		mouse = null;
 	};
 
