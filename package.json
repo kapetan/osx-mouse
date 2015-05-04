@@ -1,6 +1,6 @@
 {
   "name": "osx-mouse",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Mouse tracking for OS X",
   "main": "index.js",
   "scripts": {
