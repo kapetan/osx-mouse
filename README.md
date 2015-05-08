@@ -18,6 +18,6 @@ mouse.on('move', fuction(x, y) {
 });
 ```
 
-The program will not terminate as long as a mouse listener is active. To allow the program to exit, either call `mouse.unref` (works as `unref`/`ref` on a TCP server) or `mouse.destroy(callback)`. The destroy callback is called when all the native resources have been handled.
+The program will not terminate as long as a mouse listener is active. To allow the program to exit, either call `mouse.unref` (works as `unref`/`ref` on a TCP server) or `mouse.destroy(callback)`. The destroy callback is called when all the native resources have been disposed.
 
 The events emitted are: `move`, `left-down`, `left-up`, `left-drag`, `right-up`, `right-down` and `right-drag`. For each event the screen coordinates are passed to the handler function.
