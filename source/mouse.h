@@ -24,7 +24,6 @@ class Mouse : public node::ObjectWrap {
 	private:
 		MouseEvent* event;
 		NanCallback* event_callback;
-		NanCallback* destroy_callback;
 		uv_async_t* async;
 		uv_mutex_t async_lock;
 		uv_thread_t thread;
@@ -32,7 +31,6 @@ class Mouse : public node::ObjectWrap {
 		uv_mutex_t async_cond_lock;
 		CFRunLoopRef loop_ref;
 		bool stopped;
-		bool finished;
 
 		explicit Mouse(NanCallback*);
 		~Mouse();

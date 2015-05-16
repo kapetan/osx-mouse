@@ -29,8 +29,7 @@ NAUV_WORK_CB(OnSend) {
 
 void OnClose(uv_handle_t* handle) {
 	uv_async_t* async = (uv_async_t*) handle;
-	Mouse* mouse = (Mouse*) async->data;
-	mouse->HandleClose();
+	delete async;
 }
 
 Persistent<Function> Mouse::constructor;
@@ -41,9 +40,7 @@ Mouse::Mouse(NanCallback* callback) {
 	async->data = this;
 	loop_ref = NULL;
 	stopped = false;
-	finished = false;
 	event_callback = callback;
-	destroy_callback = NULL;
 	uv_async_init(uv_default_loop(), async, OnSend);
 	uv_mutex_init(&async_lock);
 	uv_cond_init(&async_cond);
@@ -53,15 +50,12 @@ Mouse::Mouse(NanCallback* callback) {
 
 Mouse::~Mouse() {
 	Stop();
-	uv_thread_join(&thread);
 
 	uv_mutex_destroy(&async_lock);
 	uv_cond_destroy(&async_cond);
 	uv_mutex_destroy(&async_cond_lock);
 
-	delete async;
 	delete event_callback;
-	delete destroy_callback;
 	delete event;
 }
 
@@ -113,11 +107,6 @@ void Mouse::Run() {
 	CFRunLoopRemoveSource(ref, source, kCFRunLoopCommonModes);
 	CFRelease(source);
 	CFRelease(tap);
-
-	uv_mutex_lock(&async_lock);
-	finished = true;
-	uv_mutex_unlock(&async_lock);
-	uv_async_send(async);
 }
 
 void Mouse::Stop() {
@@ -135,6 +124,8 @@ void Mouse::Stop() {
 	});
 
 	CFRunLoopWakeUp(ref);
+	uv_close((uv_handle_t*) async, OnClose);
+	uv_thread_join(&thread);
 }
 
 void Mouse::HandleEvent(CGEventType type, CGEventRef e) {
@@ -148,27 +139,18 @@ void Mouse::HandleEvent(CGEventType type, CGEventRef e) {
 	uv_async_send(async);
 }
 
-void Mouse::HandleClose() {
-	if(destroy_callback) destroy_callback->Call(0, NULL);
-	Unref();
-}
-
 void Mouse::HandleSend() {
+	if(stopped) return;
+
 	NanScope();
 
 	uv_mutex_lock(&async_lock);
-	bool f = finished;
 	MouseEvent e = {
 		event->x,
 		event->y,
 		event->type
 	};
 	uv_mutex_unlock(&async_lock);
-
-	if(f) {
-		uv_close((uv_handle_t*) async, OnClose);
-		return;
-	}
 
 	Local<String> name;
 
@@ -205,13 +187,8 @@ NAN_METHOD(Mouse::Destroy) {
 	NanScope();
 
 	Mouse* mouse = ObjectWrap::Unwrap<Mouse>(args.Holder());
-
-	if(args[0]->IsFunction()) {
-		NanCallback* callback = new NanCallback(args[0].As<Function>());
-		mouse->destroy_callback = callback;
-	}
-
 	mouse->Stop();
+	mouse->Unref();
 
 	NanReturnUndefined();
 }

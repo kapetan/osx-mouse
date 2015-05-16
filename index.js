@@ -20,9 +20,8 @@ module.exports = function() {
 		if(mouse) mouse.unref();
 	};
 
-	that.destroy = function(callback) {
-		if(mouse) mouse.destroy(callback);
-		else if(callback) callback();
+	that.destroy = function() {
+		if(mouse) mouse.destroy();
 		mouse = null;
 	};
 
