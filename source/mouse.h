@@ -1,3 +1,6 @@
+#ifndef _MOUSE_H
+#define _MOUSE_H
+
 #include <CoreGraphics/CoreGraphics.h>
 #include <node.h>
 #include <node_object_wrap.h>
@@ -40,3 +43,5 @@ class Mouse : public node::ObjectWrap {
 		static NAN_METHOD(AddRef);
 		static NAN_METHOD(RemoveRef);
 };
+
+#endif
