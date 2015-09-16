@@ -14,10 +14,10 @@ struct MouseEvent {
 	CGEventType type;
 };
 
-class Mouse : public node::ObjectWrap {
+class Mouse : public Nan::ObjectWrap {
 	public:
 		static void Initialize(Handle<Object> exports);
-		static Persistent<Function> constructor;
+		static Nan::Persistent<Function> constructor;
 		void Run();
 		void Stop();
 		void HandleEvent(CGEventType type, CGEventRef event);
@@ -26,7 +26,7 @@ class Mouse : public node::ObjectWrap {
 
 	private:
 		MouseEvent* event;
-		NanCallback* event_callback;
+		Nan::Callback* event_callback;
 		uv_async_t* async;
 		uv_mutex_t async_lock;
 		uv_thread_t thread;
@@ -35,7 +35,7 @@ class Mouse : public node::ObjectWrap {
 		CFRunLoopRef loop_ref;
 		bool stopped;
 
-		explicit Mouse(NanCallback*);
+		explicit Mouse(Nan::Callback*);
 		~Mouse();
 
 		static NAN_METHOD(New);
