@@ -1,7 +1,7 @@
 #ifndef _MOUSE_H
 #define _MOUSE_H
 
-#include <CoreGraphics/CoreGraphics.h>
+#include <ApplicationServices/ApplicationServices.h>
 #include <node.h>
 #include <nan.h>
 
