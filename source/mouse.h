@@ -27,6 +27,7 @@ class Mouse : public Nan::ObjectWrap {
 
 	private:
 		Nan::Callback* event_callback;
+		Nan::AsyncResource* async_resource;
 		uv_async_t* async;
 		uv_mutex_t async_lock;
 		uv_thread_t thread;
