@@ -37,6 +37,7 @@ class Mouse : public Nan::ObjectWrap {
 		MouseEvent* eventBuffer[BUFFER_SIZE];
 		unsigned int readIndex;
 		unsigned int writeIndex;
+
 		explicit Mouse(Nan::Callback*);
 		~Mouse();
 

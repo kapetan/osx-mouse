@@ -45,6 +45,7 @@ Mouse::Mouse(Nan::Callback* callback) {
 	for(size_t i = 0; i < BUFFER_SIZE; i++) {
 		eventBuffer[i] = new MouseEvent();
 	}
+
 	readIndex = 0;
 	writeIndex = 0;
 	async = new uv_async_t;
@@ -160,6 +161,7 @@ void Mouse::HandleSend() {
 
 	Nan::HandleScope scope;
 	uv_mutex_lock(&async_lock);
+
 	while(readIndex != writeIndex) {
 		MouseEvent e = {
 			eventBuffer[readIndex]->x,
@@ -185,6 +187,7 @@ void Mouse::HandleSend() {
 		};
 		event_callback->Call(3, argv);
 	}
+
 	uv_mutex_unlock(&async_lock);
 }
 
