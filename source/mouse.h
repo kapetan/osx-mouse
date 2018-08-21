@@ -13,6 +13,8 @@ struct MouseEvent {
 	CGEventType type;
 };
 
+const unsigned int BUFFER_SIZE = 10;
+
 class Mouse : public Nan::ObjectWrap {
 	public:
 		static void Initialize(Handle<Object> exports);
@@ -24,7 +26,6 @@ class Mouse : public Nan::ObjectWrap {
 		void HandleSend();
 
 	private:
-		MouseEvent* event;
 		Nan::Callback* event_callback;
 		uv_async_t* async;
 		uv_mutex_t async_lock;
@@ -33,7 +34,9 @@ class Mouse : public Nan::ObjectWrap {
 		uv_mutex_t async_cond_lock;
 		CFRunLoopRef loop_ref;
 		bool stopped;
-
+		MouseEvent* eventBuffer[BUFFER_SIZE];
+		unsigned int readIndex;
+		unsigned int writeIndex;
 		explicit Mouse(Nan::Callback*);
 		~Mouse();
 

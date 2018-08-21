@@ -26,7 +26,6 @@ void RunThread(void* arg) {
 CGEventRef OnMouseEvent(CGEventTapProxy proxy, CGEventType type, CGEventRef event, void* context) {
 	Mouse* mouse = (Mouse*) context;
 	mouse->HandleEvent(type, event);
-
 	return NULL;
 }
 
@@ -43,7 +42,11 @@ void OnClose(uv_handle_t* handle) {
 Nan::Persistent<Function> Mouse::constructor;
 
 Mouse::Mouse(Nan::Callback* callback) {
-	event = new MouseEvent();
+	for(size_t i = 0; i < BUFFER_SIZE; i++) {
+		eventBuffer[i] = new MouseEvent();
+	}
+	readIndex = 0;
+	writeIndex = 0;
 	async = new uv_async_t;
 	async->data = this;
 	loop_ref = NULL;
@@ -64,7 +67,10 @@ Mouse::~Mouse() {
 	uv_mutex_destroy(&async_cond_lock);
 
 	delete event_callback;
-	delete event;
+
+	for(size_t i = 0; i < BUFFER_SIZE; i++) {
+		delete eventBuffer[i];
+	}
 }
 
 void Mouse::Initialize(Handle<Object> exports) {
@@ -138,45 +144,48 @@ void Mouse::Stop() {
 
 void Mouse::HandleEvent(CGEventType type, CGEventRef e) {
 	if(!IsMouseEvent(type)) return;
+
 	CGPoint location = CGEventGetLocation(e);
 	uv_mutex_lock(&async_lock);
-	event->x = location.x;
-	event->y = location.y;
-	event->type = type;
-	uv_mutex_unlock(&async_lock);
+	eventBuffer[writeIndex]->x = location.x;
+	eventBuffer[writeIndex]->y = location.y;
+	eventBuffer[writeIndex]->type = type;
+	writeIndex = (writeIndex + 1) % BUFFER_SIZE;
 	uv_async_send(async);
+	uv_mutex_unlock(&async_lock);
 }
 
 void Mouse::HandleSend() {
 	if(stopped) return;
 
 	Nan::HandleScope scope;
-
 	uv_mutex_lock(&async_lock);
-	MouseEvent e = {
-		event->x,
-		event->y,
-		event->type
-	};
+	while(readIndex != writeIndex) {
+		MouseEvent e = {
+			eventBuffer[readIndex]->x,
+			eventBuffer[readIndex]->y,
+			eventBuffer[readIndex]->type
+		};
+		readIndex = (readIndex + 1) % BUFFER_SIZE;
+
+		const char* name;
+
+		if(e.type == kCGEventLeftMouseDown) name = LEFT_DOWN;
+		if(e.type == kCGEventLeftMouseUp) name = LEFT_UP;
+		if(e.type == kCGEventRightMouseDown) name = RIGHT_DOWN;
+		if(e.type == kCGEventRightMouseUp) name = RIGHT_UP;
+		if(e.type == kCGEventMouseMoved) name = MOVE;
+		if(e.type == kCGEventLeftMouseDragged) name = LEFT_DRAG;
+		if(e.type == kCGEventRightMouseDragged) name = RIGHT_DRAG;
+
+		Local<Value> argv[] = {
+			Nan::New<String>(name).ToLocalChecked(),
+			Nan::New<Number>(e.x),
+			Nan::New<Number>(e.y)
+		};
+		event_callback->Call(3, argv);
+	}
 	uv_mutex_unlock(&async_lock);
-
-	const char* name;
-
-	if(e.type == kCGEventLeftMouseDown) name = LEFT_DOWN;
-	if(e.type == kCGEventLeftMouseUp) name = LEFT_UP;
-	if(e.type == kCGEventRightMouseDown) name = RIGHT_DOWN;
-	if(e.type == kCGEventRightMouseUp) name = RIGHT_UP;
-	if(e.type == kCGEventMouseMoved) name = MOVE;
-	if(e.type == kCGEventLeftMouseDragged) name = LEFT_DRAG;
-	if(e.type == kCGEventRightMouseDragged) name = RIGHT_DRAG;
-
-	Local<Value> argv[] = {
-		Nan::New<String>(name).ToLocalChecked(),
-		Nan::New<Number>(e.x),
-		Nan::New<Number>(e.y)
-	};
-
-	event_callback->Call(3, argv);
 }
 
 NAN_METHOD(Mouse::New) {
