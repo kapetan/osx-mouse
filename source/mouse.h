@@ -17,7 +17,7 @@ const unsigned int BUFFER_SIZE = 10;
 
 class Mouse : public Nan::ObjectWrap {
 	public:
-		static void Initialize(Handle<Object> exports);
+		static void Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports);
 		static Nan::Persistent<Function> constructor;
 		void Run();
 		void Stop();
