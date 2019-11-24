@@ -88,7 +88,7 @@ void Mouse::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
 	Nan::SetPrototypeMethod(tpl, "unref", Mouse::RemoveRef);
 
 	Mouse::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-	exports->Set(Nan::New<String>("Mouse").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+	Nan::Set(exports, Nan::New<String>("Mouse").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Mouse::Run() {
