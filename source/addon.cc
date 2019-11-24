@@ -1,7 +1,7 @@
 #include "mouse.h"
 
-void Initialize(Handle<Object> exports) {
-	Mouse::Initialize(exports);
+NAN_MODULE_INIT(Initialize) {
+	Mouse::Initialize(target);
 }
 
 NODE_MODULE(addon, Initialize)

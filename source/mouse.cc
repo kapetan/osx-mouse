@@ -76,7 +76,7 @@ Mouse::~Mouse() {
 	}
 }
 
-void Mouse::Initialize(Handle<Object> exports) {
+void Mouse::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
 	Nan::HandleScope scope;
 
 	Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(Mouse::New);
@@ -87,8 +87,8 @@ void Mouse::Initialize(Handle<Object> exports) {
 	Nan::SetPrototypeMethod(tpl, "ref", Mouse::AddRef);
 	Nan::SetPrototypeMethod(tpl, "unref", Mouse::RemoveRef);
 
-	Mouse::constructor.Reset(tpl->GetFunction());
-	exports->Set(Nan::New<String>("Mouse").ToLocalChecked(), tpl->GetFunction());
+	Mouse::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+	exports->Set(Nan::New<String>("Mouse").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Mouse::Run() {
