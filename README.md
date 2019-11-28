@@ -4,6 +4,10 @@ Mouse tracking for OS X. Receive the screen position of various mouse events. Th
 
 	npm install osx-mouse
 
+# Requirements
+- Not compatible with node 12. Try an older version, like v11.11.0.
+- Ensure the application that runs this (like iterm, or Mac terminal) has accessibility enabled (Settings > Privacy > Accessibility)
+
 # Usage
 
 The module returns an event emitter instance.
