@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/kapetan/osx-mouse"
+    "url": "https://github.com/loomhq/osx-mouse"
   },
   "keywords": [
     "track",
@@ -22,12 +22,12 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kapetan/osx-mouse/issues"
+    "url": "https://github.com/loomhq/osx-mouse/issues"
   },
-  "homepage": "https://github.com/kapetan/osx-mouse",
+  "homepage": "https://github.com/loomhq/osx-mouse",
   "dependencies": {
-    "bindings": "^1.2.1",
-    "nan": "^2.10.0"
+    "bindings": "^1.5.0",
+    "nan": "^2.14.0"
   },
   "os": [
     "darwin"
