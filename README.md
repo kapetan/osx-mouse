@@ -2,6 +2,8 @@
 
 Mouse tracking for OS X. Receive the screen position of various mouse events. The events are also emitted while another application is in the foreground.
 
+Versions of this library prior to version 2.0.0 also run with Node.js version 9 and below. Version 2.0.0 and above are context-aware.
+
 	npm install osx-mouse
 
 # Usage
