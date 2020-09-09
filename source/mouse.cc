@@ -79,7 +79,7 @@ Mouse::~Mouse() {
 	}
 }
 
-void Mouse::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
+void Mouse::Initialize(Local<Object> exports, Local<Value> module, Local<Context> context) {
 	Nan::HandleScope scope;
 
 	Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(Mouse::New);
@@ -91,7 +91,9 @@ void Mouse::Initialize(Nan::ADDON_REGISTER_FUNCTION_ARGS_TYPE exports) {
 	Nan::SetPrototypeMethod(tpl, "unref", Mouse::RemoveRef);
 
 	Mouse::constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-	Nan::Set(exports, Nan::New<String>("Mouse").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+	exports->Set(context,
+		Nan::New("Mouse").ToLocalChecked(),
+		Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Mouse::Run() {
@@ -208,7 +210,6 @@ NAN_METHOD(Mouse::New) {
 
 	Mouse* obj = new Mouse(callback);
 	obj->Wrap(info.This());
-	obj->Ref();
 
 	info.GetReturnValue().Set(info.This());
 }
@@ -216,7 +217,6 @@ NAN_METHOD(Mouse::New) {
 NAN_METHOD(Mouse::Destroy) {
 	Mouse* mouse = Nan::ObjectWrap::Unwrap<Mouse>(info.Holder());
 	mouse->Stop();
-	mouse->Unref();
 
 	info.GetReturnValue().SetUndefined();
 }
