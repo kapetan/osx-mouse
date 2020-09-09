@@ -32,9 +32,8 @@ class Mouse : public Nan::ObjectWrap {
 		uv_mutex_t async_lock;
 		uv_thread_t thread;
 		uv_cond_t async_cond;
-		uv_mutex_t async_cond_lock;
 		CFRunLoopRef loop_ref;
-		bool stopped;
+		volatile bool stopped;
 		MouseEvent* eventBuffer[BUFFER_SIZE];
 		unsigned int readIndex;
 		unsigned int writeIndex;

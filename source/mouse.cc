@@ -57,7 +57,6 @@ Mouse::Mouse(Nan::Callback* callback) {
 	uv_async_init(uv_default_loop(), async, OnSend);
 	uv_mutex_init(&async_lock);
 	uv_cond_init(&async_cond);
-	uv_mutex_init(&async_cond_lock);
 	uv_thread_create(&thread, RunThread, this);
 }
 
@@ -66,10 +65,14 @@ Mouse::~Mouse() {
 
 	uv_mutex_destroy(&async_lock);
 	uv_cond_destroy(&async_cond);
-	uv_mutex_destroy(&async_cond_lock);
 
 	delete event_callback;
-	delete async_resource;
+
+	// HACK: Sometimes deleting async resource segfaults.
+	// Probably related to https://github.com/nodejs/nan/issues/772
+	if (!Nan::GetCurrentContext().IsEmpty()) {
+		delete async_resource;
+	}
 
 	for(size_t i = 0; i < BUFFER_SIZE; i++) {
 		delete eventBuffer[i];
@@ -113,10 +116,10 @@ void Mouse::Run() {
 	CFRunLoopAddSource(ref, source, kCFRunLoopCommonModes);
 	CGEventTapEnable(tap, true);
 
-	uv_mutex_lock(&async_cond_lock);
+	uv_mutex_lock(&async_lock);
 	loop_ref = ref;
 	uv_cond_signal(&async_cond);
-	uv_mutex_unlock(&async_cond_lock);
+	uv_mutex_unlock(&async_lock);
 
 	CFRunLoopRun();
 
@@ -127,44 +130,50 @@ void Mouse::Run() {
 }
 
 void Mouse::Stop() {
-	if(stopped) return;
-	stopped = true;
+	uv_mutex_lock(&async_lock);
 
-	uv_mutex_lock(&async_cond_lock);
-	while(loop_ref == NULL) uv_cond_wait(&async_cond, &async_cond_lock);
-	CFRunLoopRef ref = loop_ref;
-	uv_mutex_unlock(&async_cond_lock);
+	if (!stopped) {
+		stopped = true;
+		while(loop_ref == NULL) uv_cond_wait(&async_cond, &async_lock);
+		CFRunLoopRef ref = loop_ref;
 
-	CFRunLoopPerformBlock(ref, kCFRunLoopCommonModes, ^{
-		CFRunLoopRef current = CFRunLoopGetCurrent();
-		CFRunLoopStop(current);
-	});
+		CFRunLoopPerformBlock(ref, kCFRunLoopCommonModes, ^{
+			CFRunLoopRef current = CFRunLoopGetCurrent();
+			CFRunLoopStop(current);
+		});
 
-	CFRunLoopWakeUp(ref);
-	uv_close((uv_handle_t*) async, OnClose);
-	uv_thread_join(&thread);
+		CFRunLoopWakeUp(ref);
+		uv_close((uv_handle_t*) async, OnClose);
+		uv_thread_join(&thread);
+	}
+
+	uv_mutex_unlock(&async_lock);
 }
 
 void Mouse::HandleEvent(CGEventType type, CGEventRef e) {
-	if(!IsMouseEvent(type)) return;
+	if(!IsMouseEvent(type) || stopped) return;
 
 	CGPoint location = CGEventGetLocation(e);
+
 	uv_mutex_lock(&async_lock);
-	eventBuffer[writeIndex]->x = location.x;
-	eventBuffer[writeIndex]->y = location.y;
-	eventBuffer[writeIndex]->type = type;
-	writeIndex = (writeIndex + 1) % BUFFER_SIZE;
-	uv_async_send(async);
+
+	if (!stopped) {
+		eventBuffer[writeIndex]->x = location.x;
+		eventBuffer[writeIndex]->y = location.y;
+		eventBuffer[writeIndex]->type = type;
+		writeIndex = (writeIndex + 1) % BUFFER_SIZE;
+		uv_async_send(async);
+	}
+
 	uv_mutex_unlock(&async_lock);
 }
 
 void Mouse::HandleSend() {
-	if(stopped) return;
-
-	Nan::HandleScope scope;
 	uv_mutex_lock(&async_lock);
 
-	while(readIndex != writeIndex) {
+	Nan::HandleScope scope;
+
+	while(readIndex != writeIndex && !stopped) {
 		MouseEvent e = {
 			eventBuffer[readIndex]->x,
 			eventBuffer[readIndex]->y,
