@@ -4,6 +4,7 @@
   "description": "Mouse tracking for OS X",
   "main": "index.js",
   "scripts": {
+    "lint": "standard",
     "test": "node test/parallel-destroy && node test/parallel-unref && node test/sequence-destroy && node test/sequence-unref"
   },
   "repository": {
@@ -31,5 +32,8 @@
   },
   "os": [
     "darwin"
-  ]
+  ],
+  "devDependencies": {
+    "standard": "^14.3.4"
+  }
 }
