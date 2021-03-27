@@ -1,7 +1,7 @@
 {
-  "name": "osx-mouse",
+  "name": "osx-mouse-with-middle",
   "version": "2.0.0",
-  "description": "Mouse tracking for OS X",
+  "description": "Mouse tracking for OS X. This fork detects the middle mouse.",
   "main": "index.js",
   "scripts": {
     "lint": "standard",
