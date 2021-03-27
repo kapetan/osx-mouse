@@ -4,6 +4,8 @@ const char* LEFT_DOWN = "left-down";
 const char* LEFT_UP = "left-up";
 const char* RIGHT_DOWN = "right-down";
 const char* RIGHT_UP = "right-up";
+const char* MIDDLE_DOWN = "middle-down";
+const char* MIDDLE_UP = "middle-up";
 const char* MOVE = "move";
 const char* LEFT_DRAG = "left-drag";
 const char* RIGHT_DRAG = "right-drag";
@@ -13,6 +15,8 @@ bool IsMouseEvent(CGEventType type) {
 		type == kCGEventLeftMouseUp ||
 		type == kCGEventRightMouseDown ||
 		type == kCGEventRightMouseUp ||
+    type == kCGEventOtherMouseDown ||
+    type == kCGEventOtherMouseUp ||
 		type == kCGEventMouseMoved ||
 		type == kCGEventLeftMouseDragged ||
 		type == kCGEventRightMouseDragged;
@@ -102,6 +106,8 @@ void Mouse::Run() {
 		CGEventMaskBit(kCGEventLeftMouseUp) |
 		CGEventMaskBit(kCGEventRightMouseDown) |
 		CGEventMaskBit(kCGEventRightMouseUp) |
+		CGEventMaskBit(kCGEventOtherMouseDown) |
+		CGEventMaskBit(kCGEventOtherMouseUp) |
 		CGEventMaskBit(kCGEventMouseMoved) |
 		CGEventMaskBit(kCGEventLeftMouseDragged) |
 		CGEventMaskBit(kCGEventRightMouseDragged);
@@ -189,6 +195,8 @@ void Mouse::HandleSend() {
 		if(e.type == kCGEventLeftMouseUp) name = LEFT_UP;
 		if(e.type == kCGEventRightMouseDown) name = RIGHT_DOWN;
 		if(e.type == kCGEventRightMouseUp) name = RIGHT_UP;
+		if(e.type == kCGEventOtherMouseDown) name = MIDDLE_DOWN;
+		if(e.type == kCGEventOtherMouseUp) name = MIDDLE_UP;
 		if(e.type == kCGEventMouseMoved) name = MOVE;
 		if(e.type == kCGEventLeftMouseDragged) name = LEFT_DRAG;
 		if(e.type == kCGEventRightMouseDragged) name = RIGHT_DRAG;
