@@ -20,7 +20,7 @@ mouse.on('move', function(x, y) {
 
 The program will not terminate as long as a mouse listener is active. To allow the program to exit, either call `mouse.unref` (works as `unref`/`ref` on a TCP server) or `mouse.destroy()`.
 
-The events emitted are: `move`, `left-down`, `left-up`, `left-drag`, `right-up`, `right-down` and `right-drag`. For each event the screen coordinates are passed to the handler function.
+The events emitted are: `move`, `left-down`, `left-up`, `left-drag`, `right-up`, `right-down`, `right-drag`, `middle-up`, `middle-down` and `middle-drag`. For each event the screen coordinates are passed to the handler function.
 
 # Limitations
 
